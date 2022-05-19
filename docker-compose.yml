@@ -1,0 +1,29 @@
+version: '2.2'
+
+services:
+  mytbedge:
+    container_name: thingsboard-edge
+    image: "thingsboard/tb-edge:3.3.4.1EDGE"
+    ports:
+      - "8080:8080"
+      - "1883:1883"
+      - "5683-5688:5683-5688/udp"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tb-edge
+      CLOUD_ROUTING_KEY: ${{ secrets.CloudRoutingKey }}
+      CLOUD_ROUTING_SECRET: ${{ secrets.CloudRoutingSecret }}
+      CLOUD_RPC_HOST: thingsboard.cloud
+    volumes:
+      - ~/.mytb-edge-data:/data
+      - ~/.mytb-edge-logs:/var/log/tb-edge
+
+  postgres:
+    restart: always
+    image: "postgres:12"
+    ports:
+      - "5432"
+    environment:
+      POSTGRES_DB: tb-edge
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ~/.mytb-edge-data/db:/var/lib/postgresql/data
