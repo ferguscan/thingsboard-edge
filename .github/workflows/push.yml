@@ -6,12 +6,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build the stack
-        run: docker-compose up -d
+        run: |
+          docker-compose up -d
+          sleep 30s
+          docker run --network container:thingsboard-edge appropriate/curl -s --retry 10 --retry-connrefused http://localhost:8080/
         env:
           CLOUD_ROUTING_KEY: ${{ secrets.CloudRoutingKey }}
           CLOUD_ROUTING_SECRET: ${{ secrets.CloudRoutingSecret }}
-      - name: Sleep for 30 seconds
-        run: sleep 30s
         shell: bash
-      - name: Test
-        run: docker run --network container:thingsboard-edge appropriate/curl -s --retry 10 --retry-connrefused http://localhost:8080/
